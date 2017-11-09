@@ -1,4 +1,4 @@
-# Pollstop.com API
+# Pollstop API
 Backend API server code for pollstop project
 
 
