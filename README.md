@@ -38,25 +38,25 @@ This project requires Python and Django to build, if they are not installed on y
 
 #### Install Python dependencies
 ```bash
-$ pip3 install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 #### Initial Server Setup
 1. Collect Static Files
 ```bash
-$ ./manage.py collectstatic
-$ ./manage.py migrate
+./manage.py collectstatic
+./manage.py migrate
 ```
 
 2. Create Django Database
 ```bash
-$ ./manage.py makemigrations
-$ ./manage.py migrate
+./manage.py makemigrations
+./manage.py migrate
 ```
 
 3. Create Admin account
 ```bash
-$ ./manage.py createsuperuser
+./manage.py createsuperuser
 ```
 
 _Note:_ users info can be changed later from *AUTHENTICATION AND AUTHORIZATION* section in the admin dashboard
