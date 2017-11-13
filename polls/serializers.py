@@ -5,6 +5,8 @@ from . import models
 
 class PollSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
+    #tags = serializers.SerializerMethodField()
+    answers = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
@@ -21,3 +23,9 @@ class PollSerializer(serializers.ModelSerializer):
 
     def get_type(self, poll):
         return 'poll'
+
+    def get_answers(self, poll):
+        return poll.answers.values_list('content', flat=True)
+
+    #def get_tags(self, poll):
+    #    return poll.tags.values_list('name')

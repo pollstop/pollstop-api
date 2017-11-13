@@ -15,7 +15,7 @@ SECRET_KEY = '+sefjgg=jy9vu-xzw#5lv!+4=)m&+)ju7f78!=%h2!x_tcvl@t'
 DEBUG = True
 
 # SECURITY WARNING: change these to your domain or server IP address in production!
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', '[::1]', '165.227.171.147', ]
 
 # Application definition
 
