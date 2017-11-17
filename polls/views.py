@@ -20,9 +20,15 @@ class PollViewSet(mixins.CreateModelMixin,
         serializer = self.get_serializer(latest_polls, many=True)
         return Response(serializer.data)
 
+    def create(self, request):
+        # TODO: Override create method to create question choices as well:
+        # http://www.django-rest-framework.org/api-guide/viewsets/
+        # validate fields (make sure request has 2, 3, 4 or 5 choices as well)
+        # after creating the question create its answers here as well.
+        pass
 
-class ChoiceViewSet(mixins.UpdateModelMixin,
-                    viewsets.GenericViewSet):
+
+class ChoiceViewSet(viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated,)
 
     queryset = models.Choice.objects.all()
@@ -30,6 +36,9 @@ class ChoiceViewSet(mixins.UpdateModelMixin,
 
     @detail_route(['put'])
     def vote(self, request, pk=None):
+        # TODO: Make sure to unvote other choices for the same question before
+        # creating a new vote, we don't want users voting for more than one
+        # choice for the same question :)
         choice = self.get_object()
         user = request.user
         user.votes.add(choice)

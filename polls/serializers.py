@@ -24,6 +24,7 @@ class PollSerializer(serializers.ModelSerializer):
         return 'poll'
 
     def get_choices(self, question):
+        # get all choices for given question
         choices = models.Choice.objects.filter(question_id=question.id)
         serializer = ChoiceSerializer(choices, many=True)
         return serializer.data
@@ -40,4 +41,5 @@ class ChoiceSerializer(serializers.ModelSerializer):
         model = models.Choice
 
     def get_votes(self, choice):
+        # Iterate over all users and get vote counts for this choice
         return User.objects.all().filter(votes__in=[choice]).count()

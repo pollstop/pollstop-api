@@ -19,12 +19,14 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
+    token = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
             'type',
             'id',
             'email',
+            'token',
             'votes',
         )
         model = models.User
@@ -36,3 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             return 'staff'
         else:
             return 'user'
+
+    def get_token(self, user):
+        # TODO: return user's token
+        return ''
