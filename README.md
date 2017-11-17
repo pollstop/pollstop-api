@@ -12,13 +12,11 @@ Backend API server code for pollstop project
 - [License](#license)
 
 ## Features
-- `GET` / `POST` / `PUT` / `DELETE` endpoints using Django REST Framework.
+- `GET` / `POST` / `PUT` endpoints using Django REST Framework.
 - Modularized applications:
   - polls
-  - answers
-  - votes
   - tags
-  - users
+  - accounts
 - PostgreSQL or SQLite3.
 - Results pagination.
 - Requests Throttling system.
@@ -45,7 +43,6 @@ pip3 install -r requirements.txt
 1. Collect Static Files
 ```bash
 ./manage.py collectstatic
-./manage.py migrate
 ```
 
 2. Create Django Database
@@ -77,10 +74,9 @@ API Explorer is available for all [endpoints](#api-endpoints) via the URL `local
 
 #### Data Models
 - [Poll](polls/models.py)
-- [Answer](answers/models.py)
-- [Vote](votes/models.py)
+- [Choice](polls/models.py)
 - [Tag](tags/models.py)
-- [User](users/models.py)
+- [User](accounts/models.py)
 
 
 #### API Endpoints
@@ -92,33 +88,24 @@ API Explorer is available for all [endpoints](#api-endpoints) via the URL `local
   - Tags:
     - `api/v1/tags/`: get all tags (paginated).
     - `api/v1/tags/<tag_id>/`: get specific tag.
-    - `api/v1/tags/<tag_id>/polls/`: get all polls with a tag (paginated).
+    - `api/v1/tags/<tag_id>/polls/`: get all polls having a tag (paginated).
   - Users:
-    - `api/v1/users/<user_id>/public/`: get public info for a user.
-    - `api/v1/users/<user_id>/`: get all info for a user (requires authorization).
+    - `api/v1/users/<user_id>/`: get all info and votes for a user (requires authorization) / or get public info for a user (without authorization).
+    - `api/v1/users/<user_id>/token/`: get auth token for a user (requires email and password fields in request).
     - `api/v1/users/<user_id>/polls/`: get all polls owned by a user (paginated).
-    - `api/v1/users/<user_id>/votes/`: get all votes for a user (requires authorization, paginated).
 - **POST Endpoints**:
   - Polls:
-    - `api/v1/polls/`: create new poll (requires authentication).
+    - `api/v1/polls/`: create new poll and it's choices (requires authentication).
+  - Users:
+    - `api/v1/users/`: create new user (requires email, password fields in request).
   - Tags:
     - `api/v1/tags/`: create new tag (requires authentication).
-  - Answers:
-    - `api/v1/answers/`: create new answer for a poll (requires authorization).
-  - Votes:
-    - `api/v1/votes/`: create new vote for an answer (requires authentication).
 - **PUT Endpoints**:
-  - Polls:
-    - `api/v1/polls/<poll_id>/`: update poll (requires authorization).
-  - Answers:
-    - `api/v1/answer/<answer_id>/`: update answer (requires authorization).
+  - Votes:
+    - `api/v1/choices/<choice_id>/vote`: vote for a choice (requires authentication).
+    - `api/v1/choices/<choice_id>/unvote`: un-vote for a choice (requires authentication).
   - Users:
     - `api/v1/users/<user_id>/`: update user info (requires authorization).
-- **DELETE Endpoints**
-  - Polls:
-    - `api/v1/polls/<poll_id>/`: delete poll (requires authorization).
-  - Users:
-    - `api/v1/users/<user_id>/`: delete user (requires authorization).
 
 ## Contributing
 This Project is still in progress. Your feedback is always appreciated and welcomed. If you find a bug in the source code or a mistake in the documentation, you can help us by submitting an issue [**here**](https://github.com/pollstop/pollstop-api/issues). Even better you can submit a Pull Request with a fix :)
