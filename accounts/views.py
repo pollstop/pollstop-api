@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticated
 from . import models, serializers
-
+import polls
 
 class UserViewSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
@@ -44,13 +44,16 @@ class UserViewSet(mixins.CreateModelMixin,
     # .../users/<user_id>/token
     @detail_route(methods=['get'])
     def token(self, request, pk=None):
+
         # TODO: Validate email and password fields are included in the request,
         # check if a user with given info exists, and return user's token.
         pass
 
     # list route to return all polls for user
     # .../users/<user_id>/polls
-    @list_route(methods=['get'])
-    def token(self, request, pk=None):
-        # TODO: return all polls owned by given user
-        pass
+    @detail_route(methods=['get'])
+    def polls(self, request, pk=None):
+        user = self.get_object()
+        questions = polls.models.Question.objects.all().filter(owner=user)
+        serializer = polls.serializers.PollSerializer(questions, many=True)
+        return Response(serializer.data)
