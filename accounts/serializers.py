@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from . import models
 
 
@@ -40,5 +41,4 @@ class UserSerializer(serializers.ModelSerializer):
             return 'user'
 
     def get_token(self, user):
-        # TODO: return user's token
-        return ''
+        return Token.objects.get(user=user).key
