@@ -18,8 +18,8 @@ class AuthViewSet(mixins.CreateModelMixin,
     # .../users/<user_id>/token
     @list_route(methods=['POST'])
     def token(self, request):
-        email = request.POST.get('email', None)
-        password = request.POST.get('password', None)
+        email = request.data.get('email', None)
+        password = request.data.get('password', None)
 
         if not email:
             content = {'message': 'email field not found'}
@@ -43,7 +43,7 @@ class AuthViewSet(mixins.CreateModelMixin,
         except Token.DoesNotExist:
             token = Token.objects.create(user=user)
 
-        content = {'token': token.key}
+        content = {'id': user.id, 'token': token.key}
         return Response(content, status=status.HTTP_200_OK)
 
 
@@ -57,6 +57,7 @@ class UserViewSet(mixins.UpdateModelMixin,
 
     def retrieve(self, request, pk=None):
         queryset = models.User.objects.all()
+        # TODO: check this part for user not found case.
         user = get_object_or_404(queryset, pk=pk)
 
         if user == request.user:
