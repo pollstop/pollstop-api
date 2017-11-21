@@ -8,17 +8,22 @@ Backend API server code for pollstop project
 - [Structure](#structure)
   - [Data Models](#data-models)
   - [API Endpoints](#api-endpoints)
+- [Using the API](#using-the-api)
+  - [Create new user](#create-new-user)
+  - [Get user token](#get-user-token)
+  - [Create new poll](#create-new-poll)
+  - [Vote for a poll](#vote-for-a-poll)
+  - [Unvote for a poll](#unvote-for-a-poll)
+  - [Create new tag](#create-new-tag)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
-- `GET` / `POST` / `PUT` / `DELETE` endpoints using Django REST Framework.
+- `GET` / `POST` / `PUT` endpoints using Django REST Framework.
 - Modularized applications:
   - polls
-  - answers
-  - votes
   - tags
-  - users
+  - accounts
 - PostgreSQL or SQLite3.
 - Results pagination.
 - Requests Throttling system.
@@ -45,7 +50,6 @@ pip3 install -r requirements.txt
 1. Collect Static Files
 ```bash
 ./manage.py collectstatic
-./manage.py migrate
 ```
 
 2. Create Django Database
@@ -77,10 +81,9 @@ API Explorer is available for all [endpoints](#api-endpoints) via the URL `local
 
 #### Data Models
 - [Poll](polls/models.py)
-- [Answer](answers/models.py)
-- [Vote](votes/models.py)
+- [Choice](polls/models.py)
 - [Tag](tags/models.py)
-- [User](users/models.py)
+- [User](accounts/models.py)
 
 
 #### API Endpoints
@@ -90,35 +93,155 @@ API Explorer is available for all [endpoints](#api-endpoints) via the URL `local
     - `api/v1/polls/latest/`: get latest 10 polls.
     - `api/v1/polls/<poll_id>/`: get specific poll.
   - Tags:
-    - `api/v1/tags/`: get all tags (paginated).
+    - `api/v1/tags/`: get all tags.
     - `api/v1/tags/<tag_id>/`: get specific tag.
-    - `api/v1/tags/<tag_id>/polls/`: get all polls with a tag (paginated).
+    - `api/v1/tags/<tag_id>/polls/`: get all polls having a tag.
+  - Auth:
+    - `api/v1/auth/<user_id>/token/`: get auth token for a user.
   - Users:
-    - `api/v1/users/<user_id>/public/`: get public info for a user.
-    - `api/v1/users/<user_id>/`: get all info for a user (requires authorization).
+    - `api/v1/users/<user_id>/`: get all info and votes for a user (requires auth token in request header) / or get public info for a user (without auth token).
     - `api/v1/users/<user_id>/polls/`: get all polls owned by a user (paginated).
-    - `api/v1/users/<user_id>/votes/`: get all votes for a user (requires authorization, paginated).
 - **POST Endpoints**:
   - Polls:
-    - `api/v1/polls/`: create new poll (requires authentication).
+    - `api/v1/polls/`: create new poll and it's choices.
+  - Auth:
+    - `api/v1/auth/`: create new user.
   - Tags:
-    - `api/v1/tags/`: create new tag (requires authentication).
-  - Answers:
-    - `api/v1/answers/`: create new answer for a poll (requires authorization).
-  - Votes:
-    - `api/v1/votes/`: create new vote for an answer (requires authentication).
+    - `api/v1/tags/`: create new tag (requires auth token in request header).
 - **PUT Endpoints**:
-  - Polls:
-    - `api/v1/polls/<poll_id>/`: update poll (requires authorization).
-  - Answers:
-    - `api/v1/answer/<answer_id>/`: update answer (requires authorization).
-  - Users:
-    - `api/v1/users/<user_id>/`: update user info (requires authorization).
-- **DELETE Endpoints**
-  - Polls:
-    - `api/v1/polls/<poll_id>/`: delete poll (requires authorization).
-  - Users:
-    - `api/v1/users/<user_id>/`: delete user (requires authorization).
+  - Votes:
+    - `api/v1/choices/<choice_id>/vote`: vote for a choice (requires auth token in request header).
+    - `api/v1/choices/<choice_id>/unvote`: un-vote for a choice (requires auth token in request header).
+
+
+## Using the API
+
+#### Create new user
+- Method: `POST`
+- Endpoint: `api/v1/auth/`
+- Body:
+  - `email` user email address (required).
+  - `password` user password (required).
+  - `display_name` display name for user (required).
+  - `bio` user's bio (optional).
+
+Example response:
+```
+{
+    "type": "user",
+    "id": 19652,
+    "email": "email@test.com",
+    "display_name": "Test User",
+    "bio": "Nothing to see here, I'm a test user!",
+    "date_joined": "2017-11-21T08:47:07.713294Z",
+    "token": "027bb3a58728d6e3721b029ef45825ecdab64b83",
+    "votes": []
+}
+```
+
+#### Get user token
+- Method: `GET`
+- Endpoint: `api/v1/auth/token/`
+- Body:
+  - `email` user email address (required).
+  - `password` user password (required).
+
+Example response:
+```
+{
+    "token": "027bb3a58728d6e3721b029ef45825ecdab64b83"
+}
+```
+
+
+#### Create new poll
+- Method: `POST`
+- Endpoint: `api/v1/polls/`
+- Headers:
+  - `Authorization`: auth token, example: `Token 027bb3a58728d6e3721b029ef45825ecdab64b83`
+- Body:
+  - `title` poll's title (required).
+  - `description` poll's description (optional).
+  - `choice_1` first choice for the poll.
+  - `choice_2` second choice for the poll.
+  - `choice_3` third choice for the poll.
+  - `choice_4` forth choice for the poll.
+
+_Note:_ New poll must have at least 2 choices, and at max 4 choices.
+
+Example response:
+```
+{
+    "type": "poll",
+    "id": 23128794,
+    "title": "Do you like pollstop?",
+    "description": "Assuming you have used the api or visited the website :)",
+    "date_created": "2017-11-21T08:57:05.109839Z",
+    "owner": 2131,
+    "choices": [
+        {
+            "id": 5872513,
+            "text": "Yes, I love it!",
+            "votes": 0
+        },
+        {
+            "id": 5872514,
+            "text": "No I don't :(",
+            "votes": 0
+        }
+    ]
+}
+```
+
+
+#### Vote for a poll
+- Method: `PUT`
+- Endpoint: `api/v1/choices/5872513/vote/`
+- Headers:
+  - `Authorization`: auth token, example: `Token 027bb3a58728d6e3721b029ef45825ecdab64b83`
+
+Example response:
+```
+{
+    "id": 5872513,
+    "text": "Yes, I love it!",
+    "votes": 194
+}
+```
+
+
+#### Unvote for a poll
+- Method: `PUT`
+- Endpoint: `api/v1/choices/5872513/unvote/`
+- Headers:
+  - `Authorization`: auth token, example: `Token 027bb3a58728d6e3721b029ef45825ecdab64b83`
+
+Example response:
+```
+{
+    "id": 5872513,
+    "text": "Yes, I love it!",
+    "votes": 193
+}
+```
+
+#### Create new tag
+- Method: `POST`
+- Endpoint: `api/v1/tags/`
+- Headers:
+  - `Authorization`: auth token, example: `Token 027bb3a58728d6e3721b029ef45825ecdab64b83`
+- Body:
+  - `name` tag's name (required).
+
+Example response:
+```
+{
+    "type": "tag",
+    "id": 1,
+    "name": "Technology"
+}
+```
+
 
 ## Contributing
 This Project is still in progress. Your feedback is always appreciated and welcomed. If you find a bug in the source code or a mistake in the documentation, you can help us by submitting an issue [**here**](https://github.com/pollstop/pollstop-api/issues). Even better you can submit a Pull Request with a fix :)
