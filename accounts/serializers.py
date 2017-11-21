@@ -21,12 +21,26 @@ class PublicUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     token = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True, default=None)
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        if not password:
+            raise serializers.ValidationError("User must have password")
+        user = super().create(validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
     class Meta:
         fields = (
             'type',
             'id',
             'email',
+            'display_name',
+            'bio',
+            'date_joined',
+            'password',
             'token',
             'votes',
         )
@@ -41,4 +55,9 @@ class UserSerializer(serializers.ModelSerializer):
             return 'user'
 
     def get_token(self, user):
-        return Token.objects.get(user=user).key
+        try:
+            token = Token.objects.get(user=user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=user)
+
+        return token.key

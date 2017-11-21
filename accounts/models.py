@@ -3,30 +3,37 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin
 )
+
 from django.db import models
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, display_name=None, password=None):
+    def create_user(self, email, display_name=None, password=None):
         if not email:
             raise ValueError("Users must have an email address")
+
         if not display_name:
-            display_name = username
+            display_name = email
 
         user = self.model(
             email=self.normalize_email(email),
-            username=username,
             display_name=display_name
         )
         user.set_password(password)
         user.save()
+        token = Token.objects.create(user=user)
+        token.save()
         return user
 
-    def create_superuser(self, email, username, display_name, password):
+    def create_superuser(self, email, display_name, password):
+
+        if not display_name:
+            display_name = email
+
         user = self.create_user(
             email,
-            username,
             display_name,
             password
         )
@@ -38,7 +45,6 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=40, unique=True)
     display_name = models.CharField(max_length=140)
     bio = models.CharField(max_length=140, blank=True, default='')
     date_joined = models.DateTimeField(default=timezone.now)
@@ -49,13 +55,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['display_name', 'username']
+    REQUIRED_FIELDS = ['display_name', ]
 
     def __str__(self):
-        return '@{}'.format(self.username)
+        return '{}'.format(self.email)
 
     def get_short_name(self):
-        return self.display_name
+        return '{}'.format(self.display_name)
 
     def get_long_name(self):
-        return '{} (@{})'.format(self.display_name, self.username)
+        return '{} ({})'.format(self.display_name, self.email)

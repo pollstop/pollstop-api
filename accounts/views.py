@@ -1,19 +1,59 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins
+from rest_framework.authtoken.models import Token
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import detail_route, list_route
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from . import models, serializers
 import polls
 
-class UserViewSet(mixins.CreateModelMixin,
-                  mixins.UpdateModelMixin,
+
+class AuthViewSet(mixins.CreateModelMixin,
+                  viewsets.GenericViewSet):
+    queryset = models.User.objects.all()
+    serializer_class = serializers.UserSerializer
+    permission_classes = (AllowAny,)
+
+    # detail route to return or create token for user
+    # .../users/<user_id>/token
+    @list_route(methods=['POST'])
+    def token(self, request):
+        email = request.POST.get('email', None)
+        password = request.POST.get('password', None)
+
+        if not email:
+            content = {'message': 'email field not found'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        if not password:
+            content = {'message': 'password field not found'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        user = models.User.objects.get(email=email)
+        if not user:
+            content = {'message': 'user not found'}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+        if not user.check_password(password):
+            content = {'message': 'incorrect password'}
+            return Response(content, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            token = Token.objects.get(user=user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=user)
+
+        content = {'token': token.key}
+        return Response(content, status=status.HTTP_200_OK)
+
+
+class UserViewSet(mixins.UpdateModelMixin,
                   mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
 
-    permission_classes = (IsAuthenticated,)
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def retrieve(self, request, pk=None):
         queryset = models.User.objects.all()
@@ -26,32 +66,9 @@ class UserViewSet(mixins.CreateModelMixin,
             serializer = serializers.PublicUserSerializer(user)
             return Response(serializer.data)
 
-    def create(self, request):
-        # TODO: Override create method
-        # http://www.django-rest-framework.org/api-guide/viewsets/
-        # validate fields and creat a new user
-        # Make sure create a new token for new user
-        # http://www.django-rest-framework.org/api-guide/authentication/
-        pass
-
-    def update(self, request, pk=None):
-        # TODO: Override update method
-        # http://www.django-rest-framework.org/api-guide/viewsets/
-        # validate fields and update user with given pk
-        pass
-
-    # detail route to return token for user
-    # .../users/<user_id>/token
-    @detail_route(methods=['get'])
-    def token(self, request, pk=None):
-
-        # TODO: Validate email and password fields are included in the request,
-        # check if a user with given info exists, and return user's token.
-        pass
-
     # list route to return all polls for user
     # .../users/<user_id>/polls
-    @detail_route(methods=['get'])
+    @detail_route(methods=['GET'])
     def polls(self, request, pk=None):
         user = self.get_object()
         questions = polls.models.Question.objects.all().filter(owner=user)

@@ -70,6 +70,7 @@ class PollSerializer(serializers.ModelSerializer):
         serializer = ChoiceSerializer(choices, many=True)
         return serializer.data
 
+
 class ChoiceSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
 
