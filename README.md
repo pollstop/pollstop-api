@@ -140,7 +140,7 @@ Example response:
 ```
 
 #### Get user token
-- Method: `GET`
+- Method: `POST`
 - Endpoint: `api/v1/auth/token/`
 - Body:
   - `email` user email address (required).
