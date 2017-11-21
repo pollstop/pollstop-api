@@ -16,5 +16,6 @@ router.register(r'tags', tv.TagViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^api/v1/auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/v1/', include(router.urls, namespace='apiv1')),
 ]

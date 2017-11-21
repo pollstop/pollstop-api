@@ -16,8 +16,8 @@ SECRET_KEY = 'f9*wpk+)$%yqh!7&er$crj#)$0hj6413#cjlaoo4zn91=)d#a@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# SECURITY WARNING: change to your domain or server IP address in production!
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+# SECURITY WARNING: change these to your domain or server IP address in production!
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', '[::1]', '165.227.171.147', ]
 
 
 # Application definition
