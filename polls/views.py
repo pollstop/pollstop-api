@@ -22,10 +22,7 @@ class PollViewSet(mixins.CreateModelMixin,
 
     def create(self, request):
         # Add owner id to request
-        mutable = request.POST._mutable
-        request.POST._mutable = True
-        request.POST['owner'] = request.user.id
-        request.POST._mutable = mutable
+        request.data['owner'] = request.user.id
         return super().create(request)
 
 
