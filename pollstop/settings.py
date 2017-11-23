@@ -19,6 +19,8 @@ DEBUG = True
 # SECURITY WARNING: change these to your domain or server IP address in production!
 ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', '[::1]', '165.227.171.147', ]
 
+# Append slash to end of urls
+APPEND_SLASH=False
 
 # Application definition
 
@@ -143,5 +145,5 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '5000/day',
         'user': '10000/hour',
-    }
+    },
 }

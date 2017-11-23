@@ -7,7 +7,7 @@ class Question(models.Model):
     description = models.CharField(max_length=320, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
-    tags = models.ManyToManyField('tags.Tag', blank=True)
+    #tags = models.ManyToManyField('tags.Tag', blank=True)
 
     class Meta:
         ordering = ['-date_created', 'title', ]

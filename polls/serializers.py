@@ -25,6 +25,7 @@ class PollSerializer(serializers.ModelSerializer):
             'choice_2',
             'choice_3',
             'choice_4',
+            #'tags',
         )
 
         model = models.Question
@@ -66,9 +67,17 @@ class PollSerializer(serializers.ModelSerializer):
 
     def get_choices(self, question):
         # get all choices for given question
+        # TODO: we should store choice of user had voted so we can make that
+        # button different color if user already voted, which is visible to
+        # only that user
         choices = models.Choice.objects.filter(question_id=question.id)
         serializer = ChoiceSerializer(choices, many=True)
         return serializer.data
+
+    #def get_tags(self, question):
+    #tags = models.Tags.objects.filter(question_id=question.id)
+    #serializer = TagSerializer(tags, many=True)
+    #return serializer.data
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
