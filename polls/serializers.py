@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from . import models
 from accounts.models import User
+from .models import Question
 
 
 class PollSerializer(serializers.ModelSerializer):
@@ -82,11 +83,13 @@ class PollSerializer(serializers.ModelSerializer):
 
 class ChoiceSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
+    poll = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
             'id',
             'text',
+            'poll',
             'votes',
         )
         model = models.Choice
@@ -94,3 +97,6 @@ class ChoiceSerializer(serializers.ModelSerializer):
     def get_votes(self, choice):
         # Iterate over all users and get vote counts for this choice
         return User.objects.all().filter(votes__in=[choice]).count()
+
+    def get_poll(self, choice):
+        return Question.objects.filter(choice__in=[choice])[0].id

@@ -28,7 +28,7 @@ class PollViewSet(mixins.CreateModelMixin,
         return super().create(request)
 
 
-class ChoiceViewSet(viewsets.GenericViewSet):
+class ChoiceViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin,):
     permission_classes = (IsAuthenticated,)
 
     queryset = models.Choice.objects.all()
