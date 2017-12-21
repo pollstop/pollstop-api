@@ -8,9 +8,11 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'type',
             'id',
+            'type',
             'email',
+            'display_name',
+            'date_joined',
         )
         model = models.User
 
