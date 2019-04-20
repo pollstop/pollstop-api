@@ -17,7 +17,13 @@ SECRET_KEY = 'f9*wpk+)$%yqh!7&er$crj#)$0hj6413#cjlaoo4zn91=)d#a@'
 DEBUG = True
 
 # SECURITY WARNING: change these to your domain or server IP address in production!
-ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', '[::1]', '165.227.171.147', ]
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    '[::1]', 
+    '165.227.171.147', 
+    'poll.n0pe.me',
+]
 
 # Append slash to end of urls
 APPEND_SLASH=False
